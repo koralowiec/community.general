@@ -16,6 +16,7 @@
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    identities_only: true
     state: present
   register: options_add
   check_mode: yes
@@ -45,6 +46,7 @@
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    identities_only: true
     state: present
   register: options_add
 
@@ -63,6 +65,7 @@
     proxycommand: "ssh jumphost.example.com -W %h:%p"
     forward_agent: true
     host_key_algorithms: "+ssh-rsa"
+    identities_only: true
     state: present
   register: options_add_again
 
@@ -85,6 +88,7 @@
       - "'proxycommand ssh jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent yes' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-rsa' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly yes' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Update host
   community.general.ssh_config:
@@ -93,6 +97,7 @@
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: no
     host_key_algorithms: "+ssh-ed25519"
+    identities_only: false
     state: present
   register: options_update
 
@@ -113,6 +118,7 @@
     proxycommand: "ssh new-jumphost.example.com -W %h:%p"
     forward_agent: no
     host_key_algorithms: "+ssh-ed25519"
+    identities_only: false
     state: present
   register: options_update
 
@@ -136,6 +142,7 @@
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
 
 - name: Options - Ensure no update in case option exist in ssh_config file but wasn't defined in playbook
   community.general.ssh_config:
@@ -164,6 +171,7 @@
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' in slurp_ssh_config['content'] | b64decode"
 
 - name: Debug
   debug:
@@ -210,3 +218,4 @@
       - "'proxycommand ssh new-jumphost.example.com -W %h:%p' not in slurp_ssh_config['content'] | b64decode"
       - "'forwardagent no' not in slurp_ssh_config['content'] | b64decode"
       - "'hostkeyalgorithms +ssh-ed25519' not in slurp_ssh_config['content'] | b64decode"
+      - "'identitiesonly no' not in slurp_ssh_config['content'] | b64decode"

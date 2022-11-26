@@ -92,6 +92,10 @@ options:
     description:
       - Sets the C(HostKeyAlgorithms) option.
     type: str
+  identities_only:
+    description:
+      - Sets the C(IdentitiesOnly) option.
+    type: bool
 requirements:
 - StormSSH
 notes:
@@ -215,10 +219,8 @@ class SSHConfig():
         )
 
         # Convert True / False to 'yes' / 'no' for usage in ssh_config
-        if self.params['forward_agent'] is True:
-            args['forward_agent'] = 'yes'
-        if self.params['forward_agent'] is False:
-            args['forward_agent'] = 'no'
+        self.set_bool_arg(args, 'forward_agent')
+        self.set_bool_arg(args, 'identities_only')
 
         config_changed = False
         hosts_changed = []
@@ -277,6 +279,14 @@ class SSHConfig():
                               hosts_change_diff=hosts_change_diff,
                               hosts_added=hosts_added)
 
+    def set_bool_arg(self, args, key):
+        value = self.params[key]
+
+        if value is True:
+            args[key] = 'yes'
+        elif value is False:
+            args[key] = 'no'
+
     @staticmethod
     def change_host(options, **kwargs):
         options = deepcopy(options)
@@ -303,6 +313,7 @@ def main():
             host=dict(type='str', required=True),
             hostname=dict(type='str'),
             host_key_algorithms=dict(type='str', no_log=False),
+            identities_only=dict(type='bool'),
             identity_file=dict(type='path'),
             port=dict(type='str'),
             proxycommand=dict(type='str', default=None),
